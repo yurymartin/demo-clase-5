@@ -375,4 +375,4 @@ This software is proprietary and confidential. Unauthorized copying, distributio
 **Last Updated**: March 2024
 
 ---
-*DevSecOps training material developed by [Dany Elliot](https://github.com/danyelliot)*
+*DevSecOps training material developed by [Daniel Malvaceda](https://github.com/danyelliot)*
