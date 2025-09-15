@@ -74,6 +74,7 @@ public class SecurityUtils {
         } catch (Exception e) {
             logger.severe("Password hashing failed: " + e.getMessage());
             e.printStackTrace();
+            return null;
         }
     }
     
@@ -221,6 +222,7 @@ public class SecurityUtils {
             return encryptedData;
         } catch (Exception e) {
             logger.severe("Encryption failed: " + e.getMessage());
+            return null;
         }
     }
     
