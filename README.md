@@ -367,3 +367,6 @@ This software is proprietary and confidential. Unauthorized copying, distributio
 **Team**: Payments Engineering Team  
 **Maintainer**: payments-team@fintech-corp.com  
 **Last Updated**: March 2024
+
+---
+*DevSecOps training material developed by [Dany Elliot](https://github.com/danyelliot)*
