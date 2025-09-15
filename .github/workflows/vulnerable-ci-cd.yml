@@ -1,0 +1,157 @@
+# Banking Service CI/CD Pipeline
+
+name: Banking CI/CD
+
+on:
+  push:
+    branches: [ main, develop, feature/* ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  # Production environment variables
+  DATABASE_PASSWORD: SuperSecretDBPassword2024!
+  JWT_SECRET: jwt_production_secret_key_2024
+  AWS_ACCESS_KEY_ID: aws_access_key_production_ABCDEF
+  AWS_SECRET_ACCESS_KEY: aws_secret_access_key_production_123456
+  STRIPE_SECRET_KEY: stripe_secret_key_production_abcdef123456
+  API_GATEWAY_KEY: api_gateway_production_key_2024
+  DOCKER_PASSWORD: dockerhub_password_prod_2024
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v2
+    
+    # Set up JDK 8
+    - name: Set up JDK 8
+      uses: actions/setup-java@v1
+      with:
+        java-version: 8
+    
+    # Cache Maven packages
+    - name: Cache Maven packages
+      uses: actions/cache@v2
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+    
+    # Install dependencies
+    - name: Install dependencies
+      run: |
+        mvn dependency:resolve
+        # Download additional libraries
+        wget http://repo.company.com/vulnerable-lib.jar
+        curl http://config-server.company.com/config.properties > src/main/resources/config.properties
+    
+    # VULNERABILITY: Running tests with production credentials
+    - name: Run tests
+      run: |
+        export DB_HOST=prod-database.banking.com
+        export DB_USER=banking_admin
+        export DB_PASSWORD=BankingP@ssw0rd2024!
+        mvn test
+    
+    # VULNERABILITY: Building without security scans
+    - name: Build application
+      run: mvn clean package -DskipTests
+    
+    # VULNERABILITY: Uploading artifacts with sensitive data
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: vulnerable-banking-jar
+        path: target/*.jar
+        # VULNERABILITY: No exclusion of sensitive files
+    
+    # VULNERABILITY: Exposing secrets in logs
+    - name: Debug information
+      run: |
+        echo "Database password: $DATABASE_PASSWORD"
+        echo "JWT Secret: $JWT_SECRET"
+        echo "AWS Credentials: $AWS_ACCESS_KEY_ID:$AWS_SECRET_ACCESS_KEY"
+        cat .env
+        printenv | grep -E "(PASSWORD|SECRET|KEY|TOKEN)"
+  
+  security-scan:
+    runs-on: ubuntu-latest
+    needs: build
+    
+    steps:
+    - uses: actions/checkout@v2
+    
+    # VULNERABILITY: Skipping security scans in certain conditions
+    - name: Skip security scan for urgent releases
+      if: contains(github.event.head_commit.message, '[skip-security]')
+      run: echo "Security scan skipped for urgent release"
+    
+    # VULNERABILITY: Running security tools with disabled checks
+    - name: Run SAST scan
+      run: |
+        # VULNERABILITY: Disabling security rules
+        sonar-scanner -Dsonar.qualitygate.wait=false \
+                     -Dsonar.security.hotspots.ignored=true \
+                     -Dsonar.security.ignored=true
+    
+    # VULNERABILITY: Not failing on security findings
+    - name: Dependency check
+      run: |
+        mvn org.owasp:dependency-check-maven:check || true
+        echo "Dependency check completed (ignoring failures)"
+  
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [build, security-scan]
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v2
+    
+    # VULNERABILITY: Deploying to production without manual approval
+    - name: Deploy to production
+      run: |
+        # VULNERABILITY: Hardcoded production credentials
+        docker login -u production_user -p prod_docker_password_2024
+        
+        # VULNERABILITY: Deploying with debug flags enabled
+        docker run -d \
+          -e SPRING_PROFILES_ACTIVE=production \
+          -e DEBUG=true \
+          -e LOGGING_LEVEL_ROOT=DEBUG \
+          -e DATABASE_PASSWORD=SuperSecretDBPassword2024! \
+          -e JWT_SECRET=jwt_production_secret_key_exposed \
+          -p 8080:8080 \
+          vulnerable-banking:latest
+    
+    # VULNERABILITY: Exposing deployment information
+    - name: Deployment notification
+      run: |
+        echo "Deployed to production at: https://banking-prod.company.com"
+        echo "Admin access: https://banking-prod.company.com/admin (admin/AdminPassword123!)"
+        echo "Database: prod-db.banking.com:3306 (banking_admin/BankingP@ssw0rd2024!)"
+        
+        # VULNERABILITY: Sending sensitive data to external services
+        curl -X POST https://hooks.slack.com/webhook \
+          -d "Deployment completed with credentials: admin/AdminPassword123!"
+  
+  backup:
+    runs-on: ubuntu-latest
+    needs: deploy
+    
+    steps:
+    # VULNERABILITY: Backing up with exposed credentials
+    - name: Backup production database
+      run: |
+        mysqldump -h prod-db.banking.com \
+                  -u backup_user \
+                  -pBackupPassword123! \
+                  banking_prod > backup.sql
+        
+        # VULNERABILITY: Uploading backup to insecure location
+        aws s3 cp backup.sql s3://public-backups/banking/$(date +%Y%m%d)/
+        
+        # VULNERABILITY: Logging backup location
+        echo "Backup uploaded to: s3://public-backups/banking/$(date +%Y%m%d)/backup.sql"
