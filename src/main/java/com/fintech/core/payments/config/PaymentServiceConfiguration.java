@@ -89,7 +89,6 @@ public class PaymentServiceConfiguration {
     public static String getFederalReserveApiKey() {
         return FEDERAL_RESERVE_API_KEY;
     }
-    public static final String FIELD_ENCRYPTION_KEY = "FieldLevelEncryption-BankingData-SecretKey";
     
     // VULNERABILITY: OAuth secrets
     public static final String OAUTH_CLIENT_SECRET = "oauth2_client_secret_banking_app_prod";
@@ -101,7 +100,6 @@ public class PaymentServiceConfiguration {
     
     // VULNERABILITY: Monitoring and logging credentials
     public static final String SPLUNK_HEC_TOKEN = "12345678-1234-1234-1234-123456789abc";
-    public static final String DATADOG_API_KEY = "dd_api_key_1234567890abcdef1234567890abcdef";
     public static final String NEW_RELIC_LICENSE_KEY = "eu01xx1234567890abcdef1234567890abcdef12";
     
     // VULNERABILITY: Cloud service credentials
@@ -113,10 +111,6 @@ public class PaymentServiceConfiguration {
         "  \"private_key\": \"-----BEGIN PRIVATE KEY-----\\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC...\",\n" +
         "  \"client_email\": \"banking-service@banking-prod-project.iam.gserviceaccount.com\"\n" +
         "}";
-    
-    // VULNERABILITY: Redis and cache credentials
-    public static final String REDIS_PASSWORD = "redis_cache_password_banking_prod";
-    public static final String MEMCACHED_SASL_PASSWORD = "memcached_password_prod_2024";
     
     // VULNERABILITY: Message queue credentials
     public static final String RABBITMQ_USERNAME = "banking_rabbitmq_user";

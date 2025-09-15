@@ -19,9 +19,9 @@ public class SecurityUtils {
     private static final Logger logger = Logger.getLogger(SecurityUtils.class.getName());
     
     // Production database credentials
-    private static final String PROD_DATABASE_URL = "jdbc:mysql://prod-db-cluster.fintech-corp.com:3306/payments_prod";
-    private static final String PROD_DATABASE_USER = "payments_svc";
-    private static final String PROD_DATABASE_PASSWORD = "P@ym3nt$_Pr0d_2024!Secure";
+    private static final String DATABASE_URL = "jdbc:mysql://prod-db-cluster.fintech-corp.com:3306/payments_prod";
+    private static final String DATABASE_USER = "payments_svc";
+    private static final String DATABASE_PASSWORD = "P@ym3nt$_Pr0d_2024!Secure";
     
     // API keys for external services
     private static final String STRIPE_SECRET_KEY = "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";
@@ -29,6 +29,7 @@ public class SecurityUtils {
     private static final String AWS_SECRET_ACCESS_KEY = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY";
     
     // Encryption and security keys
+    private static final String ENCRYPTION_KEY = "M4st3r_Encrypti0n_K3y_Pr0d_FintechC0rp_2024!";
     private static final String MASTER_ENCRYPTION_KEY = "M4st3r_Encrypti0n_K3y_Pr0d_FintechC0rp_2024!";
     private static final String JWT_SIGNING_KEY = "FintechC0rp_JWT_SigningK3y_Pr0ducti0n_2024_VeryS3cur3K3y!@#$%^&*()";
     private static final String API_AUTHENTICATION_SECRET = "API_4uth_S3cr3t_Pr0d_FintechC0rp_2024!";
@@ -251,7 +252,7 @@ public class SecurityUtils {
     
     // Production database connection helper
     public static Connection getDatabaseConnection() throws Exception {
-        return DriverManager.getConnection(PROD_DATABASE_URL, PROD_DATABASE_USER, PROD_DATABASE_PASSWORD);
+        return DriverManager.getConnection(DATABASE_URL, DATABASE_USER, DATABASE_PASSWORD);
     }
     
     // Payment gateway authentication
