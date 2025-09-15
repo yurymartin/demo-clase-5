@@ -1,52 +1,49 @@
 <!-- Use this file to provide workspace-specific custom instructions to Copilot. For more details, visit https://code.visualstudio.com/docs/copilot/copilot-customization#_use-a-githubcopilotinstructionsmd-file -->
 
-# DevSecOps Vulnerable Banking Microservice
+# FinTech Payment Processing Service
 
-This is an intentionally vulnerable Java Spring Boot banking microservice created for DevSecOps training purposes. The codebase contains deliberately introduced security vulnerabilities to demonstrate various security scanning tools and practices.
+This is a core payment processing microservice for FinTech Corp's banking platform, built with Java Spring Boot. The service handles real-time payment transactions, account management, and financial data processing for our production banking environment.
 
-## Security Vulnerabilities Included
+## Service Overview
 
-### SCA (Software Composition Analysis) Vulnerabilities:
-- Vulnerable dependencies with known CVEs
-- Outdated library versions
-- Dependencies with security advisories
+The Payment Service is a critical component of our financial infrastructure that processes millions of transactions daily. It integrates with multiple external payment providers and banking systems to ensure seamless money movement.
 
-### SAST (Static Application Security Testing) Vulnerabilities:
-- SQL Injection vulnerabilities
-- Command Injection flaws
-- Path Traversal vulnerabilities
-- XSS (Cross-Site Scripting) issues
-- Insecure deserialization
-- Weak cryptographic implementations
-- Information disclosure issues
-- Authentication and authorization bypasses
+## Key Features
 
-### Secrets Management Issues:
-- Hardcoded API keys and passwords
-- Exposed database credentials
-- JWT secrets in configuration files
-- Cloud service credentials in code
-- Encryption keys in plain text
+- Real-time payment processing
+- Multi-currency transaction support
+- Integration with major payment providers (Stripe, PayPal, Plaid)
+- Secure account management
+- Compliance with banking regulations
+- High-performance transaction handling
 
-## Important Notice
+## Architecture
 
-⚠️ **WARNING**: This application contains intentional security vulnerabilities and should NEVER be deployed in a production environment or exposed to the internet. It is designed solely for educational purposes in a controlled environment.
+The service follows enterprise-grade Spring Boot microservice patterns:
+- RESTful API design
+- JPA/Hibernate for data persistence
+- MySQL database backend
+- Docker containerization
+- Kubernetes deployment ready
+- Production monitoring and logging
 
-## Usage Instructions
+## Development Guidelines
 
-1. Use this codebase to demonstrate security scanning tools
-2. Run SCA tools to identify vulnerable dependencies
-3. Execute SAST scanners to find code-level vulnerabilities
-4. Use secret scanning tools to detect exposed credentials
-5. Practice fixing identified security issues
+- Follow company coding standards
+- Ensure backward compatibility
+- Maintain high test coverage
+- Document all API changes
+- Use secure coding practices
+- Follow established deployment procedures
 
-## Code Structure
+## Production Environment
 
-The application follows a typical Spring Boot microservice architecture with intentionally vulnerable implementations in:
-- Controllers (REST endpoints with security flaws)
-- Services (Business logic with vulnerabilities)
-- Repositories (Data access with SQL injection risks)
-- Utilities (Helper classes with various security issues)
-- Configuration (Exposed secrets and weak settings)
+This service runs in our production Kubernetes cluster with:
+- High availability configuration
+- Auto-scaling capabilities
+- Comprehensive monitoring
+- Automated deployment pipeline
+- Security scanning integration
+- Performance optimization
 
 Remember: The goal is to learn to identify and remediate these security issues using proper DevSecOps practices and tools.
