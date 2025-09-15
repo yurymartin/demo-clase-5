@@ -1,0 +1,26 @@
+name: ✅ Quick Check
+
+on: [push, pull_request]
+
+jobs:
+  quick-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📋 Checkout code
+      uses: actions/checkout@v4
+    
+    - name: ☕ Setup Java 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        
+    - name: 🔍 Validate Maven project
+      run: mvn validate
+      
+    - name: 🔨 Compile project
+      run: mvn clean compile
+      
+    - name: ✅ Success
+      run: echo "✅ Build completed successfully!"

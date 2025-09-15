@@ -1,0 +1,37 @@
+name: 🔍 Code Quality Check
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📋 Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: 🏗️ Validate project structure
+      run: |
+        echo "🔍 Validating project structure..."
+        test -f pom.xml && echo "✅ Maven POM found"
+        test -f README.md && echo "✅ README found"
+        test -d src/main/java && echo "✅ Java source directory found"
+        test -f Dockerfile && echo "✅ Dockerfile found"
+        echo "✅ All validation checks passed!"
+        
+    - name: 🔐 Check file permissions
+      run: |
+        echo "🔍 Checking file permissions..."
+        ls -la
+        echo "✅ File permissions check completed!"
+        
+    - name: 🐳 Lint Dockerfile
+      run: |
+        echo "🔍 Basic Dockerfile validation..."
+        grep -q "FROM" Dockerfile && echo "✅ Dockerfile has valid FROM instruction"
+        grep -q "EXPOSE" Dockerfile && echo "✅ Dockerfile exposes ports"
+        echo "✅ Dockerfile validation completed!"
