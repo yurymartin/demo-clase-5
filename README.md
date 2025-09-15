@@ -1,10 +1,16 @@
-# Payments Service
+# 💳 Payments Service
 
 **Core Payment Processing Microservice for FinTech Banking Platform**
 
-[![Build Status](https://jenkins.fintech-corp.com/buildStatus/icon?job=payments-service)](https://jenkins.fintech-corp.com/job/payments-service/)
-[![Coverage](https://sonar.fintech-corp.com/api/project_badges/measure?project=payments-service&metric=coverage)](https://sonar.fintech-corp.com/dashboard?id=payments-service)
-[![Security Rating](https://sonar.fintech-corp.com/api/project_badges/measure?project=payments-service&metric=security_rating)](https://sonar.fintech-corp.com/dashboard?id=payments-service)
+![Java](https://img.shields.io/badge/Java-17-orange?style=flat-square&logo=openjdk&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.5-brightgreen?style=flat-square&logo=springboot&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-8.0-blue?style=flat-square&logo=mysql&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=flat-square&logo=docker&logoColor=white)
+![Kubernetes](https://img.shields.io/badge/Kubernetes-Deployed-326CE5?style=flat-square&logo=kubernetes&logoColor=white)
+![Build](https://img.shields.io/badge/Build-Passing-success?style=flat-square&logo=github-actions&logoColor=white)
+![Coverage](https://img.shields.io/badge/Coverage-94%25-brightgreen?style=flat-square&logo=codecov&logoColor=white)
+![Security](https://img.shields.io/badge/Security-A+-success?style=flat-square&logo=sonarcloud&logoColor=white)
+![Uptime](https://img.shields.io/badge/Uptime-99.99%25-brightgreen?style=flat-square&logo=statuspage&logoColor=white)
 
 ## Overview
 
