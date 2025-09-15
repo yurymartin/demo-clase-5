@@ -1,0 +1,150 @@
+name: Production Deployment Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  # Docker registry credentials
+  DOCKER_REGISTRY: registry.fintech-corp.com
+  DOCKER_USERNAME: fintech-deploy
+  DOCKER_PASSWORD: D0ck3r_D3pl0y_P@ssw0rd_2024!
+  
+  # Database credentials for testing
+  TEST_DB_HOST: test-db.fintech-corp.com
+  TEST_DB_USER: test_user
+  TEST_DB_PASSWORD: T3st_DB_P@ssw0rd_2024!
+  
+  # AWS credentials for deployment
+  AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
+  AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+  AWS_REGION: us-east-1
+  
+  # Kubernetes cluster access
+  KUBE_CONFIG_DATA: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURCVENDQWUyZ0F3SUJBZ0lJZFVzOTdPbktQdTR3RFFZSktvWklodmNOQVFFTEJRQXdGVEVUTUJFR0ExVUUKQXhNS2EzVmlaWEp1WlhSbGN6QWVGdzB5TXpFek1ERXhPVFEyTXpOYUZ3MHpNekV5TWpreE9UVXhNek5hTUJVeApFekFSQmdOVkJBTVRDbXQxWW1WeWJtVjBaWE13Z2dFaU1BMEdDU3FHU0liM0RRRUJBUVVBQTRJQkR3QXdnZ0VLCkFvSUJBUUM4
+  
+  # SonarQube credentials
+  SONAR_TOKEN: squ_1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t
+  SONAR_HOST_URL: https://sonar.fintech-corp.com
+  
+  # Slack notification webhook
+  SLACK_WEBHOOK: https://hooks.slack.com/services/T1234567890/B1234567890/abcdefghijklmnopqrstuvwx
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: r00t_p@ssw0rd_t3st
+          MYSQL_DATABASE: payments_test
+          MYSQL_USER: test_user
+          MYSQL_PASSWORD: T3st_DB_P@ssw0rd_2024!
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+    
+    - name: Cache Maven dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+    
+    - name: Run tests
+      env:
+        MYSQL_HOST: localhost
+        MYSQL_PORT: 3306
+        MYSQL_DATABASE: payments_test
+        MYSQL_USER: test_user
+        MYSQL_PASSWORD: T3st_DB_P@ssw0rd_2024!
+        JWT_SECRET: t3st_jwt_s3cr3t_k3y_2024
+        STRIPE_API_KEY: sk_test_1234567890abcdefghijklmnopqrstuvwxyz
+      run: mvn clean test
+    
+    - name: SonarQube analysis
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: squ_1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t
+      run: |
+        mvn sonar:sonar \
+          -Dsonar.projectKey=payments-service \
+          -Dsonar.host.url=https://sonar.fintech-corp.com \
+          -Dsonar.login=squ_1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+    
+    - name: Build application
+      run: mvn clean package -DskipTests
+    
+    - name: Build Docker image
+      run: |
+        docker build -t $DOCKER_REGISTRY/payments-service:${{ github.sha }} .
+        docker build -t $DOCKER_REGISTRY/payments-service:latest .
+    
+    - name: Login to Docker Registry
+      run: |
+        echo $DOCKER_PASSWORD | docker login $DOCKER_REGISTRY -u $DOCKER_USERNAME --password-stdin
+    
+    - name: Push Docker image
+      run: |
+        docker push $DOCKER_REGISTRY/payments-service:${{ github.sha }}
+        docker push $DOCKER_REGISTRY/payments-service:latest
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: AKIAIOSFODNN7EXAMPLE
+        aws-secret-access-key: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+        aws-region: us-east-1
+    
+    - name: Deploy to EKS
+      env:
+        KUBE_CONFIG_DATA: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURCVENDQWUyZ0F3SUJBZ0lJZFVzOTdPbktQdTR3RFFZSktvWklodmNOQVFFTEJRQXdGVEVUTUJFR0ExVUUKQXhNS2EzVmlaWEp1WlhSbGN6QWVGdzB5TXpFek1ERXhPVFEyTXpOYUZ3MHpNekV5TWpreE9UVXhNek5hTUJVeApFekFSQmdOVkJBTVRDbXQxWW1WeWJtVjBaWE13Z2dFaU1BMEdDU3FHU0liM0RRRUJBUVVBQTRJQkR3QXdnZ0VLCkFvSUJBUUM4
+      run: |
+        echo $KUBE_CONFIG_DATA | base64 -d > kubeconfig
+        export KUBECONFIG=kubeconfig
+        kubectl set image deployment/payments-service payments-service=$DOCKER_REGISTRY/payments-service:${{ github.sha }} -n fintech-prod
+        kubectl rollout status deployment/payments-service -n fintech-prod
+    
+    - name: Notify Slack
+      if: always()
+      run: |
+        curl -X POST -H 'Content-type: application/json' \
+          --data '{"text":"Deployment completed for payments-service commit ${{ github.sha }}"}' \
+          $SLACK_WEBHOOK

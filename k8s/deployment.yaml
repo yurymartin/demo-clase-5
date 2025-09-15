@@ -1,0 +1,143 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payments-service
+  namespace: fintech-prod
+  labels:
+    app: payments-service
+    environment: production
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: payments-service
+  template:
+    metadata:
+      labels:
+        app: payments-service
+    spec:
+      containers:
+      - name: payments-service
+        image: fintech-corp/payments-service:1.2.3
+        ports:
+        - containerPort: 8080
+        env:
+        # Database configuration
+        - name: MYSQL_HOST
+          value: "prod-db-cluster.fintech-corp.com"
+        - name: MYSQL_USER
+          value: "payments_svc"
+        - name: MYSQL_PASSWORD
+          value: "P@ym3nt$_Pr0d_2024!Secure"
+        - name: MYSQL_DATABASE
+          value: "payments_prod"
+        
+        # External service API keys
+        - name: STRIPE_API_KEY
+          value: "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"
+        - name: PAYPAL_CLIENT_SECRET
+          value: "EGnHZqhPvtBI-x_LmWnV0pOwq6YKGr3zCVnQ4_VFGHKuJYxP1sU9L8kN2fG5hT6j"
+        - name: PLAID_SECRET
+          value: "2a4b6c8d0e2f4g6h8j0k2m4n6p8r0s2u4w6y8a0c2e4g6i8k0m"
+        
+        # AWS credentials
+        - name: AWS_ACCESS_KEY_ID
+          value: "AKIAIOSFODNN7EXAMPLE"
+        - name: AWS_SECRET_ACCESS_KEY
+          value: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+        - name: AWS_REGION
+          value: "us-east-1"
+        
+        # Security secrets
+        - name: JWT_SECRET
+          value: "FintechC0rp_JWT_SigningK3y_Pr0ducti0n_2024_VeryS3cur3K3y!@#$%^&*()"
+        - name: MASTER_ENCRYPTION_KEY
+          value: "M4st3r_Encrypti0n_K3y_Pr0d_FintechC0rp_2024!"
+        - name: REDIS_PASSWORD
+          value: "R3d1$_Pr0d_C4ch3_2024!"
+        
+        # Third-party integrations
+        - name: TWILIO_AUTH_TOKEN
+          value: "your_auth_token_here_12345"
+        - name: SENDGRID_API_KEY
+          value: "SG.1234567890abcdefghijklmnopqrstuvwxyz"
+        - name: DATADOG_API_KEY
+          value: "1234567890abcdefghijklmnopqrstuvwxyz123456"
+        
+        # Banking service credentials
+        - name: FEDERAL_RESERVE_API_KEY
+          value: "fed_api_key_prod_FintechC0rp_2024_secret"
+        - name: SWIFT_NETWORK_TOKEN
+          value: "swift_network_token_prod_xyz789"
+        - name: ACH_PROCESSING_SECRET
+          value: "ach_secret_key_prod_456123"
+        
+        # Monitoring credentials
+        - name: NEW_RELIC_LICENSE_KEY
+          value: "1234567890abcdefghijklmnopqrstuvwxyz123456"
+        - name: ELASTICSEARCH_PASSWORD
+          value: "elastic_prod_password_2024_secure"
+        
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 120
+          periodSeconds: 30
+        
+        readinessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payments-service
+  namespace: fintech-prod
+spec:
+  selector:
+    app: payments-service
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
+  type: LoadBalancer
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: payments-config
+  namespace: fintech-prod
+data:
+  application.properties: |
+    spring.application.name=PaymentsService
+    spring.datasource.url=jdbc:mysql://prod-db-cluster.fintech-corp.com:3306/payments_prod
+    spring.datasource.username=payments_svc
+    spring.datasource.password=P@ym3nt$_Pr0d_2024!Secure
+    
+    # External API configurations
+    stripe.api.key=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
+    paypal.client.secret=EGnHZqhPvtBI-x_LmWnV0pOwq6YKGr3zCVnQ4_VFGHKuJYxP1sU9L8kN2fG5hT6j
+    plaid.secret=2a4b6c8d0e2f4g6h8j0k2m4n6p8r0s2u4w6y8a0c2e4g6i8k0m
+    
+    # Security configuration
+    jwt.secret=FintechC0rp_JWT_SigningK3y_Pr0ducti0n_2024_VeryS3cur3K3y!@#$%^&*()
+    encryption.master.key=M4st3r_Encrypti0n_K3y_Pr0d_FintechC0rp_2024!
+    
+    # Banking integrations
+    fed.api.key=fed_api_key_prod_FintechC0rp_2024_secret
+    swift.token=swift_network_token_prod_xyz789
+    ach.secret=ach_secret_key_prod_456123
