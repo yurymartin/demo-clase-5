@@ -21,10 +21,8 @@ public class User {
     @Email
     private String email;
     
-    // VULNERABILITY: Storing password in plain text or weak encryption
     private String password;
     
-    // VULNERABILITY: Storing sensitive data without encryption
     private String ssn; // Social Security Number
     private String creditCardNumber;
     private String accountNumber;
@@ -41,7 +39,6 @@ public class User {
     private LocalDateTime createdAt;
     private LocalDateTime lastLogin;
     
-    // VULNERABILITY: Storing sensitive financial data
     private Double balance;
     private String bankRoutingNumber;
     

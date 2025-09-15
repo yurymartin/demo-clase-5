@@ -90,19 +90,15 @@ public class PaymentServiceConfiguration {
         return FEDERAL_RESERVE_API_KEY;
     }
     
-    // VULNERABILITY: OAuth secrets
     public static final String OAUTH_CLIENT_SECRET = "oauth2_client_secret_banking_app_prod";
     public static final String OAUTH_CLIENT_ID = "banking_oauth_client_id_12345";
     
-    // VULNERABILITY: SSL/Certificate passwords
     public static final String SSL_KEYSTORE_PASSWORD = "ssl_keystore_password_prod_2024";
     public static final String SSL_TRUSTSTORE_PASSWORD = "ssl_truststore_secret_banking";
     
-    // VULNERABILITY: Monitoring and logging credentials
     public static final String SPLUNK_HEC_TOKEN = "12345678-1234-1234-1234-123456789abc";
     public static final String NEW_RELIC_LICENSE_KEY = "eu01xx1234567890abcdef1234567890abcdef12";
     
-    // VULNERABILITY: Cloud service credentials
     public static final String AZURE_CLIENT_SECRET = "azure_client_secret_banking_prod_2024";
     public static final String GCP_SERVICE_ACCOUNT_KEY = "{\n" +
         "  \"type\": \"service_account\",\n" +
@@ -112,16 +108,13 @@ public class PaymentServiceConfiguration {
         "  \"client_email\": \"banking-service@banking-prod-project.iam.gserviceaccount.com\"\n" +
         "}";
     
-    // VULNERABILITY: Message queue credentials
     public static final String RABBITMQ_USERNAME = "banking_rabbitmq_user";
     public static final String RABBITMQ_PASSWORD = "rabbitmq_banking_password_2024";
     public static final String KAFKA_SASL_PASSWORD = "kafka_banking_sasl_secret";
     
-    // VULNERABILITY: Backup and disaster recovery keys
     public static final String BACKUP_ENCRYPTION_KEY = "backup_encryption_master_key_2024";
     public static final String DR_SITE_ACCESS_KEY = "disaster_recovery_access_key_secret";
     
-    // VULNERABILITY: Legacy system credentials (often overlooked)
     public static final String MAINFRAME_USER = "BNKUSR01";
     public static final String MAINFRAME_PASSWORD = "LEGACY_SYS_PWD_2024";
     public static final String COBOL_DB_PASSWORD = "COBOL_DATABASE_ACCESS_SECRET";

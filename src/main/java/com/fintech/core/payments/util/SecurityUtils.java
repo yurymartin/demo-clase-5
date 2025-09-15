@@ -68,21 +68,17 @@ public class SecurityUtils {
                 hexString.append(hex);
             }
             
-            // VULNERABILITY: Logging sensitive information
             logger.info("Password hashed: " + password + " -> " + hexString.toString());
             
             return hexString.toString();
         } catch (Exception e) {
-            // VULNERABILITY: Exposing stack traces
             logger.severe("Password hashing failed: " + e.getMessage());
             e.printStackTrace();
-            return password; // VULNERABILITY: Returning plain text on error
         }
     }
     
-    // VULNERABILITY: Weak random number generation
     public static String generateSessionToken() {
-        Random random = new Random(System.currentTimeMillis()); // VULNERABILITY: Predictable seed
+        Random random = new Random(System.currentTimeMillis());
         StringBuilder token = new StringBuilder();
         
         for (int i = 0; i < 16; i++) {
@@ -91,22 +87,18 @@ public class SecurityUtils {
         
         String sessionToken = token.toString();
         
-        // VULNERABILITY: Logging sensitive tokens
         logger.info("Generated session token: " + sessionToken);
         
         return sessionToken;
     }
     
-    // VULNERABILITY: SQL Injection through string concatenation
     public static boolean validateUser(String username, String password) {
         try {
             Connection conn = DriverManager.getConnection(DATABASE_URL, DATABASE_USER, DATABASE_PASSWORD);
             
-            // VULNERABILITY: SQL Injection
             String query = "SELECT COUNT(*) FROM users WHERE username = '" + username + 
                           "' AND password = '" + password + "'";
             
-            logger.info("Executing validation query: " + query); // VULNERABILITY: Logging query with credentials
             
             PreparedStatement stmt = conn.prepareStatement(query);
             ResultSet rs = stmt.executeQuery();
@@ -117,7 +109,6 @@ public class SecurityUtils {
             
             conn.close();
         } catch (Exception e) {
-            // VULNERABILITY: Exposing database errors
             logger.severe("Database validation error: " + e.getMessage());
             e.printStackTrace();
         }
@@ -125,10 +116,8 @@ public class SecurityUtils {
         return false;
     }
     
-    // VULNERABILITY: Path traversal vulnerability
     public static String readConfigFile(String fileName) {
         try {
-            // VULNERABILITY: No input validation for file path
             String filePath = "/etc/banking/config/" + fileName;
             
             BufferedReader reader = new BufferedReader(new FileReader(filePath));
@@ -141,7 +130,6 @@ public class SecurityUtils {
             
             reader.close();
             
-            // VULNERABILITY: Logging potentially sensitive file content
             logger.info("Read config file: " + fileName + " Content: " + content.toString());
             
             return content.toString();
@@ -151,10 +139,8 @@ public class SecurityUtils {
         }
     }
     
-    // VULNERABILITY: Command Injection
     public static String executeSystemCommand(String command) {
         try {
-            // VULNERABILITY: Direct command execution without validation
             Process process = Runtime.getRuntime().exec(command);
             
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -165,7 +151,6 @@ public class SecurityUtils {
                 output.append(line).append("\n");
             }
             
-            // VULNERABILITY: Logging command and output
             logger.info("Executed command: " + command + " Output: " + output.toString());
             
             return output.toString();
@@ -176,14 +161,11 @@ public class SecurityUtils {
         }
     }
     
-    // VULNERABILITY: Server-Side Request Forgery (SSRF)
     public static String makeHttpRequest(String urlString) {
         try {
-            // VULNERABILITY: No URL validation - allows internal network access
             URL url = new URL(urlString);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             
-            // VULNERABILITY: No timeout configuration
             connection.setRequestMethod("GET");
             connection.setRequestProperty("User-Agent", "BankingApp/1.0");
             
@@ -197,7 +179,6 @@ public class SecurityUtils {
             
             reader.close();
             
-            // VULNERABILITY: Logging potentially sensitive response data
             logger.info("HTTP request to: " + urlString + " Response: " + response.toString());
             
             return response.toString();
@@ -207,10 +188,8 @@ public class SecurityUtils {
         }
     }
     
-    // VULNERABILITY: Insecure object deserialization
     public static Object deserializeObject(byte[] data) {
         try {
-            // VULNERABILITY: Deserializing untrusted data
             ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(data));
             Object obj = ois.readObject();
             ois.close();
@@ -225,28 +204,23 @@ public class SecurityUtils {
         }
     }
     
-    // VULNERABILITY: Weak encryption implementation
     public static String encryptSensitiveData(String data) {
         try {
-            // VULNERABILITY: Using simple XOR "encryption"
             StringBuilder encrypted = new StringBuilder();
             
             for (int i = 0; i < data.length(); i++) {
                 char c = data.charAt(i);
-                // VULNERABILITY: Simple XOR with predictable key
                 char encrypted_char = (char) (c ^ ENCRYPTION_KEY.charAt(i % ENCRYPTION_KEY.length()));
                 encrypted.append(encrypted_char);
             }
             
             String encryptedData = encrypted.toString();
             
-            // VULNERABILITY: Logging original and encrypted data
             logger.info("Encrypted data: " + data + " -> " + encryptedData);
             
             return encryptedData;
         } catch (Exception e) {
             logger.severe("Encryption failed: " + e.getMessage());
-            return data; // VULNERABILITY: Returning plain text on error
         }
     }
     

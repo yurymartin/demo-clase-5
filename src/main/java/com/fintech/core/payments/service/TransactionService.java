@@ -29,13 +29,11 @@ public class TransactionService {
     @Autowired
     private UserRepository userRepository;
     
-    // VULNERABILITY: Hardcoded sensitive configuration
     private static final String AUDIT_LOG_PATH = "/var/log/banking/transactions.log";
     private static final String MASTER_KEY = "BANK_MASTER_KEY_123456789";
     private static final String SWIFT_API_KEY = "swift_api_key_exposed_in_code";
     
     public Transaction createTransaction(TransactionDTO dto, Long userId) {
-        // VULNERABILITY: No proper authorization check
         Optional<Account> fromAccount = accountRepository.findById(dto.getFromAccountId());
         Optional<Account> toAccount = accountRepository.findById(dto.getToAccountId());
         Optional<User> user = userRepository.findById(userId);
@@ -53,20 +51,16 @@ public class TransactionService {
         transaction.setDescription(dto.getDescription());
         transaction.setReference(generateReference());
         
-        // VULNERABILITY: No validation on fee manipulation
         transaction.setFeeAmount(dto.getFeeAmount());
         transaction.setFeeDescription(dto.getFeeDescription());
         
-        // VULNERABILITY: Storing sensitive data without encryption
         transaction.setRoutingNumber(dto.getRoutingNumber());
         transaction.setAccountNumberExternal(dto.getAccountNumberExternal());
         transaction.setSwiftCode(dto.getSwiftCode());
         
-        // VULNERABILITY: No balance validation
         Account from = fromAccount.get();
         Account to = toAccount.get();
         
-        // VULNERABILITY: Race condition - no proper locking
         from.setBalance(from.getBalance() - dto.getAmount());
         to.setBalance(to.getBalance() + dto.getAmount());
         
@@ -78,13 +72,11 @@ public class TransactionService {
         
         Transaction savedTransaction = transactionRepository.save(transaction);
         
-        // VULNERABILITY: Logging sensitive information
         logTransactionDetails(savedTransaction);
         
         return savedTransaction;
     }
     
-    // VULNERABILITY: Path traversal and file writing without proper validation
     private void logTransactionDetails(Transaction transaction) {
         try {
             FileWriter writer = new FileWriter(AUDIT_LOG_PATH, true);
@@ -95,47 +87,39 @@ public class TransactionService {
                 transaction.getAmount(),
                 transaction.getFromAccount().getAccountNumber(),
                 transaction.getToAccount().getAccountNumber(),
-                transaction.getRoutingNumber(), // VULNERABILITY: Logging sensitive data
                 transaction.getCreatedAt()
             );
             writer.write(logEntry);
             writer.close();
         } catch (IOException e) {
-            // VULNERABILITY: Exposing stack traces
             logger.severe("Failed to write audit log: " + e.getMessage());
             e.printStackTrace();
         }
     }
     
-    // VULNERABILITY: Weak random number generation
     private String generateReference() {
         Random random = new Random();
         return "TXN" + random.nextInt(999999);
     }
     
-    // VULNERABILITY: No access control - any user can query any transaction
     public List<Transaction> getTransactionsByUser(Long userId) {
         return transactionRepository.findByUserId(userId);
     }
     
-    // VULNERABILITY: Exposing sensitive transaction data
     public List<Transaction> getHighValueTransactions(Long userId, Double minAmount) {
         return transactionRepository.findHighValueTransactionsByUser(userId, minAmount);
     }
     
-    // VULNERABILITY: No authorization check - admin-only function exposed
     public List<Transaction> getAllTransactionsWithSensitiveData(LocalDateTime startDate, LocalDateTime endDate) {
         return transactionRepository.findTransactionsWithSensitiveDataInDateRange(startDate, endDate);
     }
     
-    // VULNERABILITY: Direct database manipulation without proper validation
     public Transaction updateTransactionStatus(Long transactionId, TransactionStatus status, String reason) {
         Optional<Transaction> transactionOpt = transactionRepository.findById(transactionId);
         if (transactionOpt.isPresent()) {
             Transaction transaction = transactionOpt.get();
             transaction.setStatus(status);
             
-            // VULNERABILITY: Logging sensitive information
             logger.info(String.format(
                 "Transaction %d status changed to %s. Reason: %s. Amount: %.2f, User: %s",
                 transactionId, status, reason, transaction.getAmount(), 
@@ -147,7 +131,6 @@ public class TransactionService {
         return null;
     }
     
-    // VULNERABILITY: Business logic flaw - allows negative amount transfers
     public Transaction processRefund(Long originalTransactionId, Double refundAmount) {
         Optional<Transaction> originalOpt = transactionRepository.findById(originalTransactionId);
         if (!originalOpt.isPresent()) {
@@ -156,7 +139,6 @@ public class TransactionService {
         
         Transaction original = originalOpt.get();
         
-        // VULNERABILITY: No validation on refund amount vs original amount
         Transaction refund = new Transaction();
         refund.setUser(original.getUser());
         refund.setFromAccount(original.getToAccount());
@@ -166,7 +148,6 @@ public class TransactionService {
         refund.setStatus(TransactionStatus.COMPLETED);
         refund.setReference("REFUND-" + original.getReference());
         
-        // VULNERABILITY: No balance validation for refunds
         Account from = refund.getFromAccount();
         Account to = refund.getToAccount();
         

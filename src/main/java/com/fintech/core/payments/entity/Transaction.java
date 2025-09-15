@@ -36,12 +36,10 @@ public class Transaction {
     private LocalDateTime createdAt;
     private LocalDateTime processedAt;
     
-    // VULNERABILITY: Storing sensitive financial details without proper encryption
     private String routingNumber;
     private String accountNumberExternal;
     private String swiftCode;
     
-    // VULNERABILITY: Storing fee structure that could be manipulated
     private Double feeAmount;
     private String feeDescription;
     

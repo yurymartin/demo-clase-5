@@ -14,15 +14,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUsername(String username);
     Optional<User> findByEmail(String email);
     
-    // VULNERABILITY: SQL Injection - using native query without proper parameterization
     @Query(value = "SELECT * FROM users WHERE username = '" + ":username" + "' AND password = '" + ":password" + "'", nativeQuery = true)
     User findByUsernameAndPasswordUnsafe(@Param("username") String username, @Param("password") String password);
     
-    // VULNERABILITY: Exposing sensitive data in query
     @Query(value = "SELECT u.*, u.ssn, u.credit_card_number, u.account_number FROM users u WHERE u.balance > ?1", nativeQuery = true)
     List<User> findUsersWithHighBalance(Double minBalance);
     
-    // VULNERABILITY: No access control in query
     @Query("SELECT u FROM User u WHERE u.role = 'ADMIN'")
     List<User> findAllAdminUsers();
     

@@ -14,7 +14,6 @@ public class UserRegistrationDTO {
     @Email
     private String email;
     
-    // VULNERABILITY: No password strength validation
     @NotBlank(message = "Password is required")
     private String password;
     
@@ -23,7 +22,6 @@ public class UserRegistrationDTO {
     private String phoneNumber;
     private String address;
     
-    // VULNERABILITY: Accepting sensitive data without proper validation
     private String ssn;
     private String creditCardNumber;
     private String motherMaidenName;

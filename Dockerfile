@@ -41,30 +41,23 @@ RUN apk add --no-cache \
     ca-certificates \
     netcat-openbsd
 
-# VULNERABILITY: Copying sensitive files
 COPY .env /app/.env
 COPY config/production.properties /app/config/
 COPY secrets/ /app/secrets/
 
-# VULNERABILITY: Setting overly permissive file permissions
 RUN chmod 777 /app -R
 
-# VULNERABILITY: Exposing unnecessary ports
 EXPOSE 8080 22 3306 5432 6379 9200
 
-# VULNERABILITY: Hardcoded credentials in RUN commands
 RUN echo "root:rootpassword" | chpasswd
 RUN echo "banking:banking123" | chpasswd
 
-# VULNERABILITY: Installing vulnerable packages
 RUN apk add --no-cache log4j=2.14.1
 
 WORKDIR /app
 
-# VULNERABILITY: Copying application with secrets
 COPY target/vulnerable-banking-*.jar app.jar
 
-# VULNERABILITY: Running application as root with dangerous JVM flags
 ENTRYPOINT ["java", \
     "-Djava.security.manager=", \
     "-Djava.security.policy=all.policy", \
@@ -77,7 +70,6 @@ ENTRYPOINT ["java", \
     "-Dlogging.level.root=DEBUG", \
     "-jar", "app.jar"]
 
-# VULNERABILITY: Comments containing sensitive information
 # Production database: mysql://banking_admin:BankingP@ssw0rd2024!@prod-db.banking.com:3306/banking_prod
 # Backup server: backup.banking.com (user: backup, pass: backup123)
 # Monitoring dashboard: https://monitoring.banking.com (admin/monitoring123)

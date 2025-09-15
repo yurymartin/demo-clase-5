@@ -18,13 +18,11 @@ public class TransactionDTO {
     private String description;
     private String reference;
     
-    // VULNERABILITY: Accepting sensitive banking details without proper validation
     private String routingNumber;
     private String accountNumberExternal;
     private String swiftCode;
     private String pin;
     
-    // VULNERABILITY: No validation on fee manipulation
     private Double feeAmount;
     private String feeDescription;
     

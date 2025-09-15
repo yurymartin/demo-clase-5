@@ -34,12 +34,10 @@ public class Account {
     private LocalDateTime createdAt;
     private LocalDateTime lastTransactionDate;
     
-    // VULNERABILITY: Storing sensitive banking information
     private String routingNumber;
     private String ibanNumber;
     private String swiftCode;
     
-    // VULNERABILITY: Storing PIN and security codes in database
     private String pin;
     private String securityCode;
     private String motherMaidenName;

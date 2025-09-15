@@ -18,15 +18,12 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     List<Account> findByType(AccountType type);
     List<Account> findByStatus(AccountStatus status);
     
-    // VULNERABILITY: SQL Injection vulnerability
     @Query(value = "SELECT * FROM accounts WHERE account_number = '" + ":accountNumber" + "'", nativeQuery = true)
     Account findByAccountNumberUnsafe(@Param("accountNumber") String accountNumber);
     
-    // VULNERABILITY: Exposing sensitive financial data
     @Query(value = "SELECT a.*, a.pin, a.security_code, a.mother_maiden_name FROM accounts a WHERE a.user_id = ?1", nativeQuery = true)
     List<Account> findAccountsWithSensitiveDataByUserId(Long userId);
     
-    // VULNERABILITY: No access control - exposes all account balances
     @Query("SELECT a FROM Account a WHERE a.balance > :minBalance ORDER BY a.balance DESC")
     List<Account> findAccountsWithHighBalance(@Param("minBalance") Double minBalance);
     
